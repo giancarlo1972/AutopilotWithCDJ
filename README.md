@@ -4,44 +4,108 @@ Complete solution for Windows Autopilot hardware hash collection and Hybrid Azur
 
 This repository contains two complementary PowerShell scripts for managing Autopilot enrollment and Hybrid Azure AD Join in Microsoft Intune environments.
 
-## Overview
+Do you need Autopilot enrollment?
+│
+├── YES → Do you need Hybrid Azure AD Join?
+│   │
+│   ├── YES → Run BOTH scripts
+│   │         1. Get-AutopilotHash.ps1 -Online
+│   │         2. Set-AutopilotWithCDJ.ps1 -TenantId ... -TenantName ...
+│   │
+│   └── NO → Run only Get-AutopilotHash.ps1 -Online
+│
+└── NO → Do you need Hybrid Azure AD Join?
+    │
+    ├── YES → Run only Set-AutopilotWithCDJ.ps1 -TenantId ... -TenantName ...
+    │
+    └── NO → No scripts needed
 
-### What These Scripts Do
+    | Scenario                                 | Scripts Needed | Order                                               |
+| ---------------------------------------- | -------------- | --------------------------------------------------- |
+| New Autopilot device with Hybrid Join    | Both           | 1. Get-AutopilotHash.ps12. Set-AutopilotWithCDJ.ps1 |
+| Existing domain-joined device            | CDJ only       | Set-AutopilotWithCDJ.ps1                            |
+| Autopilot device (cloud-only, no domain) | Autopilot only | Get-AutopilotHash.ps1                               |
+| Bulk Autopilot registration              | Autopilot only | Get-AutopilotHash.ps1 on each device                |
+| Enable Hybrid Join on enrolled devices   | CDJ only       | Set-AutopilotWithCDJ.ps1                            |
 
-**Set-AutopilotWithCDJ.ps1**
-- Configures CDJ (Cloud Domain Join) client-side SCP registry entries
-- Enables devices to discover and join Hybrid Azure AD without domain-wide SCP
-- Provides controlled rollout via Group Policy or Intune deployment
-- Supports optional Autopilot hardware hash collection
 
-**Get-AutopilotHash.ps1**
-- Dedicated script for collecting Windows Autopilot hardware hash
-- Supports both online upload to Intune and offline CSV export
-- Can be deployed independently or as part of provisioning workflow
-- Includes fallback to offline mode if online upload fails
+Standard Setup Process
 
-## Features
+Step 1: Collect Autopilot Hardware Hash
+Run this command in PowerShell as Administrator:
 
-- Clean PowerShell code with no symbols or special characters
-- Supports both online and offline operation modes
-- Configurable tenant parameters
-- Error handling and fallback mechanisms
-- Works with Windows 10 and Windows 11
-- Can be deployed via Intune, Group Policy, or USB provisioning
+powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/giancarlo1972/AutopilotWithCDJ/main/Get-AutopilotHash.ps1' -OutFile '%TEMP%\hash.ps1'; & '%TEMP%\hash.ps1' -Online"
 
-## Prerequisites
+What happens:
+Browser window opens
+Sign in with your Intune admin account ()
+Script uploads device hardware hash to Intune
+You see "Script completed" message
 
-- Windows 10 or Windows 11
-- Administrator or SYSTEM account privileges
-- Internet connection for online modes
-- Azure AD tenant with Intune
-- Active Directory domain (for Hybrid Join scenarios)
+Step 2: Configure Hybrid Azure AD Join
+Run this command in PowerShell as Administrator:
 
-## Quick Start
+powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/giancarlo1972/AutopilotWithCDJ/main/Set-AutopilotWithCDJ.ps1' -OutFile '%TEMP%\cdj.ps1'; & '%TEMP%\cdj.ps1' -TenantId 'b78d25b1-934c-433c-8534-477f0b8978f8' -TenantName 'Mountainside.com'"
+What happens:
 
-### Setup Hybrid Azure AD Join (CDJ Registry)
+Script creates registry entries for Azure AD discovery
 
-```powershell
-$url = "https://raw.githubusercontent.com/giancarlo1972/AutopilotWithCDJ/main/Set-AutopilotWithCDJ.ps1"
-Invoke-WebRequest -Uri $url -OutFile "Set-AutopilotWithCDJ.ps1"
-.\Set-AutopilotWithCDJ.ps1 -TenantId "b78d25b1-934c-433c-8534-477f0b8978f8" -TenantName "Mountainside.com"
+You see "Device is ready for Hybrid Azure AD Join"
+
+Registry keys created at HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CDJ\AAD
+
+Step 3: Verify Setup
+Check registry was created:
+reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CDJ\AAD"
+
+TenantId    REG_SZ    b78d25b1-934c-433c-8534-477f0b8978f8
+TenantName  REG_SZ    Mountainside.com
+
+
+Copy this into a USB drive - if you prefer to run everythng from here
+
+@echo off
+echo ============================================================
+echo   Mountainside Treatment Center - New PC Setup
+echo   Autopilot + Hybrid Azure AD Join Configuration
+echo ============================================================
+echo.
+echo This script will:
+echo   1. Register device in Autopilot
+echo   2. Configure Hybrid Azure AD Join
+echo.
+echo Device will be ready for user assignment after completion.
+echo.
+pause
+
+echo.
+echo ============================================================
+echo   STEP 1 of 2: Collecting Autopilot Hardware Hash
+echo ============================================================
+echo.
+echo You will be prompted to sign in with your Intune admin account.
+echo.
+
+powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/giancarlo1972/AutopilotWithCDJ/main/Get-AutopilotHash.ps1' -OutFile '%TEMP%\hash.ps1'; & '%TEMP%\hash.ps1' -Online"
+
+echo.
+echo ============================================================
+echo   STEP 2 of 2: Configuring Hybrid Azure AD Join
+echo ============================================================
+echo.
+
+powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/giancarlo1972/AutopilotWithCDJ/main/Set-AutopilotWithCDJ.ps1' -OutFile '%TEMP%\cdj.ps1'; & '%TEMP%\cdj.ps1' -TenantId 'b78d25b1-934c-433c-8534-477f0b8978f8' -TenantName 'Mountainside.com'"
+
+echo.
+echo ============================================================
+echo   SETUP COMPLETE
+echo ============================================================
+echo.
+echo Next Steps:
+echo   1. Verify device appears in Intune Autopilot devices
+echo   2. Join device to MOUNTAINSIDE domain
+echo   3. Assign device to user in Intune
+echo.
+echo Device is now ready for deployment.
+echo ============================================================
+pause
