@@ -4,30 +4,6 @@ Complete solution for Windows Autopilot hardware hash collection and Hybrid Azur
 
 This repository contains two complementary PowerShell scripts for managing Autopilot enrollment and Hybrid Azure AD Join in Microsoft Intune environments.
 
-Do you need Autopilot enrollment?
-│
-├── YES → Do you need Hybrid Azure AD Join?
-│   │
-│   ├── YES → Run BOTH scripts
-│   │         1. Get-AutopilotHash.ps1 -Online
-│   │         2. Set-AutopilotWithCDJ.ps1 -TenantId ... -TenantName ...
-│   │
-│   └── NO → Run only Get-AutopilotHash.ps1 -Online
-│
-└── NO → Do you need Hybrid Azure AD Join?
-    │
-    ├── YES → Run only Set-AutopilotWithCDJ.ps1 -TenantId ... -TenantName ...
-    │
-    └── NO → No scripts needed
-
-    | Scenario                                 | Scripts Needed | Order                                               |
-| ---------------------------------------- | -------------- | --------------------------------------------------- |
-| New Autopilot device with Hybrid Join    | Both           | 1. Get-AutopilotHash.ps12. Set-AutopilotWithCDJ.ps1 |
-| Existing domain-joined device            | CDJ only       | Set-AutopilotWithCDJ.ps1                            |
-| Autopilot device (cloud-only, no domain) | Autopilot only | Get-AutopilotHash.ps1                               |
-| Bulk Autopilot registration              | Autopilot only | Get-AutopilotHash.ps1 on each device                |
-| Enable Hybrid Join on enrolled devices   | CDJ only       | Set-AutopilotWithCDJ.ps1                            |
-
 
 Standard Setup Process
 
