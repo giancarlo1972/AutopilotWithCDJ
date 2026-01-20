@@ -4,15 +4,22 @@
     Run during OOBE on brand new machines
 
 .DESCRIPTION
-    This script:
+    This script performs the complete setup for new PCs:
     1. Enables TLS 1.2 for PowerShell Gallery
-    2. Sets execution policy
-    3. Installs Get-WindowsAutopilotInfo
-    4. Uploads hardware hash to Intune Autopilot
+    2. Sets PowerShell execution policy
+    3. Installs Get-WindowsAutopilotInfo script
+    4. Uploads device hardware hash to Intune Autopilot
     5. Configures CDJ registry for Hybrid Azure AD Join
 
 .EXAMPLE
-    powershell -ExecutionPolicy Bypass -File Setup-NewPC.ps1
+    During OOBE, press Shift+F10, then run:
+    powershell -ExecutionPolicy Bypass "iwr -UseBasicParsing https://raw.githubusercontent.com/giancarlo1972/AutopilotWithCDJ/main/Setup-NewPC.ps1 | iex"
+
+.NOTES
+    Requires:
+    - Administrator privileges
+    - Internet connectivity
+    - Intune admin credentials for online upload
 #>
 
 Write-Host ""
