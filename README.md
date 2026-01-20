@@ -13,6 +13,6 @@ powershell -ExecutionPolicy Bypass -Command "Invoke-Expression (Invoke-WebReques
 
 OR 
 
-powershell -ExecutionPolicy Bypass "iwr https://raw.githubusercontent.com/giancarlo1972/AutopilotWithCDJ/main/Setup-NewPC.ps1 | iex"
+powershell -ExecutionPolicy Bypass "iwr -UseBasicParsing https://raw.githubusercontent.com/giancarlo1972/AutopilotWithCDJ/main/Setup-NewPC.ps1 | iex"
 
 
