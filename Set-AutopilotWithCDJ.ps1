@@ -79,18 +79,39 @@ Write-Host ""
 Write-Host "Autopilot + Hybrid Azure AD Join Setup" -ForegroundColor Cyan
 Write-Host ""
 
-Write-LogMessage "Checking for WindowsAutopilotIntune module..." -Level Info
-if (!(Get-Module -ListAvailable -Name WindowsAutopilotIntune)) {
-    Write-LogMessage "Installing WindowsAutopilotIntune module..." -Level Warning
+# Try to install dependencies and module
+Write-LogMessage "Checking for Get-WindowsAutopilotInfo..." -Level Info
+
+$scriptInstalled = Get-InstalledScript -Name Get-WindowsAutopilotInfo -ErrorAction SilentlyContinue
+$moduleInstalled = Get-Module -ListAvailable -Name WindowsAutopilotIntune -ErrorAction SilentlyContinue
+
+if (!$scriptInstalled -and !$moduleInstalled) {
+    Write-LogMessage "Installing Get-WindowsAutopilotInfo script..." -Level Warning
     try {
-        Install-Module -Name WindowsAutopilotIntune -Force -Scope CurrentUser -ErrorAction Stop
-        Write-LogMessage "Module installed successfully" -Level Success
+        # Try installing as script first (easier, fewer dependencies)
+        Install-Script -Name Get-WindowsAutopilotInfo -Force -Scope CurrentUser -ErrorAction Stop
+        Write-LogMessage "Script installed successfully" -Level Success
     } catch {
-        Write-LogMessage "Failed to install module: $($_.Exception.Message)" -Level Error
-        exit 1
+        Write-LogMessage "Script installation failed. Trying module approach..." -Level Warning
+        try {
+            # Try module installation with dependencies
+            Write-LogMessage "Installing dependencies..." -Level Info
+            Install-Module -Name Microsoft.Graph.Intune -Force -Scope CurrentUser -AllowClobber -SkipPublisherCheck -ErrorAction SilentlyContinue
+            Install-Module -Name WindowsAutopilotIntune -Force -Scope CurrentUser -AllowClobber -SkipPublisherCheck -ErrorAction Stop
+            Write-LogMessage "Module installed successfully" -Level Success
+        } catch {
+            Write-LogMessage "Failed to install: $($_.Exception.Message)" -Level Error
+            Write-LogMessage "Manual installation required. See instructions below." -Level Warning
+            Write-Host ""
+            Write-Host "Manual Installation Steps:" -ForegroundColor Yellow
+            Write-Host "1. Run PowerShell as Administrator" -ForegroundColor Cyan
+            Write-Host "2. Run: Install-Script -Name Get-WindowsAutopilotInfo -Force" -ForegroundColor Cyan
+            Write-Host "3. Re-run this script" -ForegroundColor Cyan
+            exit 1
+        }
     }
 } else {
-    Write-LogMessage "WindowsAutopilotIntune module already installed" -Level Success
+    Write-LogMessage "Get-WindowsAutopilotInfo already installed" -Level Success
 }
 
 Write-Host ""
@@ -99,17 +120,21 @@ Write-Host "Hardware Hash Collection" -ForegroundColor Yellow
 if ($Online) {
     Write-LogMessage "Uploading hardware hash to Intune..." -Level Info
     try {
-        $params = @{
-            Online = $true
+        if ($scriptInstalled -or (Get-InstalledScript -Name Get-WindowsAutopilotInfo -ErrorAction SilentlyContinue)) {
+            # Use script version
+            $params = @('-Online')
+            if ($GroupTag) { $params += "-GroupTag"; $params += $GroupTag }
+            if ($Assign) { $params += "-Assign" }
+            
+            & Get-WindowsAutopilotInfo @params
+        } else {
+            # Use module version
+            $params = @{ Online = $true }
+            if ($GroupTag) { $params.GroupTag = $GroupTag }
+            if ($Assign) { $params.Assign = $true }
+            
+            Get-WindowsAutopilotInfo @params
         }
-        if ($GroupTag) { 
-            $params.GroupTag = $GroupTag 
-        }
-        if ($Assign) { 
-            $params.Assign = $true 
-        }
-        
-        Get-WindowsAutopilotInfo @params
         Write-LogMessage "Hardware hash uploaded successfully" -Level Success
     } catch {
         Write-LogMessage "Failed to upload hardware hash: $($_.Exception.Message)" -Level Error
@@ -117,7 +142,12 @@ if ($Online) {
 } else {
     Write-LogMessage "Collecting hardware hash in offline mode..." -Level Info
     $outputFile = "AutopilotHWID_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"
-    Get-WindowsAutopilotInfo -OutputFile $outputFile
+    
+    if ($scriptInstalled -or (Get-InstalledScript -Name Get-WindowsAutopilotInfo -ErrorAction SilentlyContinue)) {
+        Get-WindowsAutopilotInfo -OutputFile $outputFile
+    } else {
+        Get-WindowsAutopilotInfo -OutputFile $outputFile
+    }
     Write-LogMessage "Hardware hash saved to: $outputFile" -Level Success
 }
 
