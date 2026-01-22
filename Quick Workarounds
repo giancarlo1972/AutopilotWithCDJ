@@ -4,3 +4,7 @@ CMD
 netdom join %computername% /domain: mountainside /UserD:Mountainside\gpereira /PasswordD:*
 POWERSHELL
 Add-Computer -DomainName mountainside.local -Credential (Get-Credential)
+Add-Computer -DomainName mountainside.local -Credential (Get-Credential) -Restart
+
+
+Uninstall-Module Microsoft.Graph -AllVersions; Install-Module Microsoft.Graph -Version 2.33.0 -Force. Set-MgGraphOption -EnableLoginByWAM $false
