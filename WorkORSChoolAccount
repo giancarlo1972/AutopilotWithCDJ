@@ -1,0 +1,4 @@
+# Open PowerShell as Administrator
+Start-Process "ms-settings:workplace"
+# This opens Work Access settings directly
+# Then follow steps above
