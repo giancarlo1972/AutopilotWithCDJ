@@ -1,0 +1,6 @@
+CMD
+shutdown /r /o /f /t 00
+CMD
+netdom join %computername% /domain: mountainside /UserD:Mountainside\gpereira /PasswordD:*
+POWERSHELL
+Add-Computer -DomainName mountainside.local -Credential (Get-Credential)
