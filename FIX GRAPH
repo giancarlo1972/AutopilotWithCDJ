@@ -17,3 +17,23 @@ Connect-MgGraph -Scopes "User.Read.All","AuditLog.Read.All" -UseDeviceCode
 
 
 Import-Module Microsoft.Graph.Authentication -Force -Verbose
+
+
+FIX try two
+
+# Check if the module is still loaded in this session
+Get-Module Microsoft.Graph* 
+
+# If you see Microsoft.Graph.Authentication in the list, unload it:
+Remove-Module Microsoft.Graph.Authentication -Force -ErrorAction SilentlyContinue
+Remove-Module Microsoft.Graph -Force -ErrorAction SilentlyContinue
+
+
+Uninstall-Module Microsoft.Graph.Authentication -AllVersions -Force -ErrorAction SilentlyContinue
+Uninstall-Module Microsoft.Graph               -AllVersions -Force -ErrorAction SilentlyContinue
+
+Install-Module Microsoft.Graph -Scope CurrentUser -Force
+
+Import-Module Microsoft.Graph.Authentication -Force
+Connect-MgGraph -Scopes "User.Read.All","AuditLog.Read.All" -UseDeviceCode
+
