@@ -13,3 +13,16 @@ Install-Module Microsoft.Graph -MinimumVersion 2.33.0 -Force -Scope CurrentUser 
 Then 
 
 Connect-MgGraph -UseDeviceCode -NoWelcome -Scopes "DeviceManagementServiceConfig.ReadWrite.All","DeviceManagementManagedDevices.ReadWrite.All"
+
+
+
+Connect-MgGraph -Scopes "User.Read.All","AuditLog.Read.All" -UseDeviceCode
+
+Install-Module Microsoft.Graph -Scope CurrentUser -Force
+
+Install-Module PowerShellGet -Force
+
+Get-Module Microsoft.Graph -ListAvailable
+
+
+
