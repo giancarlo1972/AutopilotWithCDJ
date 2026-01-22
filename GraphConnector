@@ -1,0 +1,9 @@
+# 1. Remove everything completely
+Get-Module Microsoft.Graph* -ListAvailable | Uninstall-Module -AllVersions -Force -ErrorAction SilentlyContinue
+Uninstall-Module Microsoft.Graph -AllVersions -Force -ErrorAction SilentlyContinue
+
+# 2. Install the latest stable 2.x version (as of Jan 2026 this is 2.35+)
+Install-Module Microsoft.Graph -MinimumVersion 2.33.0 -Force -Scope CurrentUser -AllowClobber
+
+# 3. Verify the authentication module version
+(Get-Module Microsoft.Graph.Authentication -ListAvailable | Sort Version -Descending)[0].Version
