@@ -7,4 +7,9 @@ Add-Computer -DomainName mountainside.local -Credential (Get-Credential)
 Add-Computer -DomainName mountainside.local -Credential (Get-Credential) -Restart
 
 
-Uninstall-Module Microsoft.Graph -AllVersions; Install-Module Microsoft.Graph -Version 2.33.0 -Force. Set-MgGraphOption -EnableLoginByWAM $false
+Uninstall-Module Microsoft.Graph -AllVersions; Install-Module Microsoft.Graph -Version 2.33.0 -Force
+
+PowerShell
+Set-MgGraphOption -EnableLoginByWAM $false
+
+Connect-MgGraph -UseDeviceCode
