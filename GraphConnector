@@ -20,8 +20,6 @@ Then
 
 Connect-MgGraph -UseDeviceCode -NoWelcome -Scopes "DeviceManagementServiceConfig.ReadWrite.All","DeviceManagementManagedDevices.ReadWrite.All"
 
-
-
 Connect-MgGraph -Scopes "User.Read.All","AuditLog.Read.All" -UseDeviceCode
 
 Install-Module Microsoft.Graph -Scope CurrentUser -Force
@@ -37,4 +35,22 @@ Install-Module Microsoft.Graph -Scope CurrentUser -Force
 
 # Connect with device code instead of interactive browser
 Connect-MgGraph -Scopes "User.Read.All","AuditLog.Read.All" -UseDeviceCode
+
+$env:MSAL_EXPERIMENTAL_FLAGS = "0"   # disables WAM
+Connect-MgGraph -Scopes "User.Read.All","AuditLog.Read.All"
+
+
+
+# Remove the auth submodule first (ignore errors if not installed)
+Uninstall-Module -Name Microsoft.Graph.Authentication -AllVersions -Force -ErrorAction SilentlyContinue
+
+# Remove main Graph module
+Uninstall-Module -Name Microsoft.Graph -AllVersions -Force -ErrorAction SilentlyContinue
+
+# Install the specific version you want
+Install-Module -Name Microsoft.Graph -RequiredVersion 2.33.0 -Scope CurrentUser -Force
+
+# Connect using device code (most reliable)
+Connect-MgGraph -Scopes "User.Read.All","AuditLog.Read.All" -UseDeviceCode
+
 
