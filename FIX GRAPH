@@ -1,0 +1,19 @@
+Get-ExecutionPolicy
+# If it returns Restricted, run:
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+
+Get-Module Microsoft.Graph* -ListAvailable
+
+Uninstall-Module Microsoft.Graph -AllVersions -Force -ErrorAction SilentlyContinue
+Uninstall-Module Microsoft.Graph.Authentication -AllVersions -Force -ErrorAction SilentlyContinue
+
+
+Install-Module Microsoft.Graph -Scope CurrentUser -Force
+
+Import-Module Microsoft.Graph.Authentication -Force
+Get-Command Connect-MgGraph
+
+Connect-MgGraph -Scopes "User.Read.All","AuditLog.Read.All" -UseDeviceCode
+
+
+Import-Module Microsoft.Graph.Authentication -Force -Verbose
