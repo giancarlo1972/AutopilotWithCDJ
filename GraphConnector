@@ -1,4 +1,8 @@
 # 0. Disconnect Graph
+Uninstall-Module Microsoft.Graph* -AllVersions -Force
+Install-Module Microsoft.Graph -Version 2.33.0 -Force -Scope CurrentUser
+Import-Module Microsoft.Graph.Authentication -Force
+
 # 1. Remove everything completely
 Get-Module Microsoft.Graph* -ListAvailable | Uninstall-Module -AllVersions -Force -ErrorAction SilentlyContinue
 Uninstall-Module Microsoft.Graph -AllVersions -Force -ErrorAction SilentlyContinue
