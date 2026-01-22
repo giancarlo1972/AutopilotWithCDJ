@@ -1,5 +1,4 @@
 # 0. Disconnect Graph
-Disconnect-MgGraph
 # 1. Remove everything completely
 Get-Module Microsoft.Graph* -ListAvailable | Uninstall-Module -AllVersions -Force -ErrorAction SilentlyContinue
 Uninstall-Module Microsoft.Graph -AllVersions -Force -ErrorAction SilentlyContinue
@@ -9,3 +8,8 @@ Install-Module Microsoft.Graph -MinimumVersion 2.33.0 -Force -Scope CurrentUser 
 
 # 3. Verify the authentication module version
 (Get-Module Microsoft.Graph.Authentication -ListAvailable | Sort Version -Descending)[0].Version
+
+
+Then 
+
+Connect-MgGraph -UseDeviceCode -NoWelcome -Scopes "DeviceManagementServiceConfig.ReadWrite.All","DeviceManagementManagedDevices.ReadWrite.All"
