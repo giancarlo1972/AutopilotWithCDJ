@@ -1,3 +1,5 @@
+# 0. Disconnect Graph
+Disconnect-MgGraph
 # 1. Remove everything completely
 Get-Module Microsoft.Graph* -ListAvailable | Uninstall-Module -AllVersions -Force -ErrorAction SilentlyContinue
 Uninstall-Module Microsoft.Graph -AllVersions -Force -ErrorAction SilentlyContinue
