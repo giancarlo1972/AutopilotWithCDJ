@@ -31,4 +31,10 @@ Install-Module PowerShellGet -Force
 Get-Module Microsoft.Graph -ListAvailable
 
 
+DEVICE CODE
+# Make sure module is installed (any recent 2.x is OK)
+Install-Module Microsoft.Graph -Scope CurrentUser -Force
+
+# Connect with device code instead of interactive browser
+Connect-MgGraph -Scopes "User.Read.All","AuditLog.Read.All" -UseDeviceCode
 
