@@ -1,0 +1,11 @@
+Work Around  Device Enrollment
+
+
+%windir%\system32\deviceenroller.exe /c /AutoEnrollMDM
+
+
+GPO “Enable automatic MDM enrollment using default Microsoft Entra credentials” is applied to the computer OU
+
+User  (classic method), or
+
+Device credential if you’re using the newer pattern and it’s supported in your scenario (especially good for shared / hybrid devices where user token issues cause failures).
