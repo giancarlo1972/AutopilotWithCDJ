@@ -37,3 +37,11 @@ Install-Module Microsoft.Graph -Scope CurrentUser -Force
 Import-Module Microsoft.Graph.Authentication -Force
 Connect-MgGraph -Scopes "User.Read.All","AuditLog.Read.All" -UseDeviceCode
 
+
+
+Install-Module Microsoft.Graph -Scope CurrentUser -Force
+Import-Module Microsoft.Graph -Force
+
+Connect-MgGraph -Scopes "User.Read.All","AuditLog.Read.All" -UseDeviceCode
+
+
